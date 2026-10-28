@@ -11,7 +11,10 @@ RUN apt-get update \
 COPY docker/apache-banco.conf /etc/apache2/conf-available/banco.conf
 COPY docker/php-banco.ini     /usr/local/etc/php/conf.d/banco.ini
 COPY docker/entrypoint.sh     /usr/local/bin/entrypoint.sh
-RUN a2enconf banco && chmod +x /usr/local/bin/entrypoint.sh
+RUN a2enconf banco && chmod +x /usr/local/bin/entrypoint.sh \
+ && sed -i 's#^\(\s*\)CustomLog \${APACHE_LOG_DIR}/access.log combined#&\n\1CustomLog /var/log/apache2/banco_access.log combinado#' \
+      /etc/apache2/sites-available/000-default.conf \
+ && grep -q banco_access.log /etc/apache2/sites-available/000-default.conf
 
 COPY . /var/www/html/
 RUN mkdir -p /var/www/html/storage \
