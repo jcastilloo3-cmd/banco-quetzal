@@ -1,0 +1,25 @@
+# Blueprint de Render: New -> Blueprint -> seleccionar este repositorio
+services:
+  - type: web
+    name: banco-quetzal
+    runtime: docker
+    plan: free
+    region: oregon
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /index.php
+    autoDeploy: true
+    envVars:
+      - key: DB_HOST
+        sync: false        # host de Aiven, p. ej. mysql-banco-xxxx.aivencloud.com
+      - key: DB_PORT
+        sync: false        # puerto de Aiven, p. ej. 12345
+      - key: DB_NAME
+        value: defaultdb
+      - key: DB_USER
+        value: avnadmin
+      - key: DB_PASS
+        sync: false        # contraseña de Aiven (se ingresa en el panel de Render)
+      - key: DB_SSL
+        value: "1"
+      - key: DB_CA_CERT
+        sync: false        # opcional: contenido de ca.pem de Aiven
