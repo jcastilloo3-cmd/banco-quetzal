@@ -20,7 +20,11 @@ CREATE DATABASE IF NOT EXISTS banco_quetzal
 
 USE banco_quetzal;
 
-SET NAMES utf8mb4;
+-- Intercalación por defecto de la BD: los parámetros de los procedimientos la heredan.
+-- (MySQL 8 usa utf8mb4_0900_ai_ci por defecto y no se puede comparar con utf8mb4_unicode_ci)
+ALTER DATABASE CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+SET NAMES utf8mb4 COLLATE utf8mb4_unicode_ci;
 SET FOREIGN_KEY_CHECKS = 0;
 
 DROP TABLE IF EXISTS movimientos;
