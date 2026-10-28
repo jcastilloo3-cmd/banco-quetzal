@@ -9,7 +9,8 @@ if (!is_file(GOACCESS_REPORTE)) {
     redirigir('admin/logs.php');
 }
 
-header("Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'; "
-     . "style-src 'self' 'unsafe-inline'; img-src 'self' data:; frame-ancestors 'none'");
+// (GoAccess compila sus plantillas con new Function y trae fuentes embebidas en data:)
+header("Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; "
+     . "style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; frame-ancestors 'none'");
 header('Content-Type: text/html; charset=utf-8');
 readfile(GOACCESS_REPORTE);
