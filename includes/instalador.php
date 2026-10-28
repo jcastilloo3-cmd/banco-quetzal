@@ -14,6 +14,7 @@ function instalar_bd(bool $forzar = false): array
     }
     $cn->real_connect(DB_HOST, DB_USER, DB_PASS, null, DB_PORT, null, $flags);
     $cn->set_charset('utf8mb4');
+    $cn->query("SET NAMES utf8mb4 COLLATE utf8mb4_unicode_ci");
     $cn->query("CREATE DATABASE IF NOT EXISTS `" . $cn->real_escape_string(DB_NAME) . "` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
     $cn->select_db(DB_NAME);
 

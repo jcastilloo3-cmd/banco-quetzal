@@ -124,6 +124,7 @@ if (!function_exists('sp')) {
         }
         $cn->real_connect(DB_HOST, DB_USER, DB_PASS, DB_NAME, DB_PORT, null, $flags);
         $cn->set_charset('utf8mb4');
+        $cn->query("SET NAMES utf8mb4 COLLATE utf8mb4_unicode_ci");
         // Guatemala no usa horario de verano: UTC-6 todo el año
         $cn->query("SET time_zone = '-06:00'");
         return $cn;
