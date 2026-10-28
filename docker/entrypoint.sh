@@ -14,7 +14,12 @@ fi
 
 # Las variables de entorno del contenedor (DB_*, etc.) las lee PHP con getenv().
 
-# Crea las tablas y procedimientos la primera vez (si la BD está vacía)
-php /var/www/html/database/instalar.php || echo "[entrypoint] Aviso: no se pudo instalar la BD (revise las variables DB_*)."
+# Crea las tablas y procedimientos la primera vez (si la BD está vacía).
+# Con DB_REINSTALAR=1 borra todo y deja la BD en blanco (quitar la variable después).
+if [ "$DB_REINSTALAR" = "1" ]; then
+  php /var/www/html/database/instalar.php --forzar || echo "[entrypoint] Aviso: no se pudo reinstalar la BD."
+else
+  php /var/www/html/database/instalar.php || echo "[entrypoint] Aviso: no se pudo instalar la BD (revise las variables DB_*)."
+fi
 
 exec "$@"
