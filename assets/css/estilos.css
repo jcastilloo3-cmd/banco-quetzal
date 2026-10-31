@@ -1,9 +1,3 @@
-/* =====================================================================
-   Banco Quetzal - Hoja de estilos (HTML5 / CSS3, diseño responsivo)
-   Enfoque "mobile first": estilos base para celular y media queries
-   para tabletas y escritorio.
-   ===================================================================== */
-
 :root {
   --jade-900: #052e26;
   --jade-800: #074236;
@@ -60,7 +54,6 @@ code { font-family: Consolas, "Cascadia Mono", monospace; font-size: .9em; backg
 
 :focus-visible { outline: 3px solid var(--oro); outline-offset: 2px; }
 
-/* ---------- Encabezado ---------- */
 .barra {
   position: sticky; top: 0; z-index: 50;
   background: linear-gradient(90deg, var(--jade-800), var(--jade-700));
@@ -106,7 +99,6 @@ code { font-family: Consolas, "Cascadia Mono", monospace; font-size: .9em; backg
 .chip--cajero { background: #cfe8ff; color: #0b3b66; }
 .chip--usuario { background: var(--jade-100); color: var(--jade-800); }
 
-/* ---------- Contenido ---------- */
 .contenido { flex: 1; width: 100%; max-width: 1180px; margin: 0 auto; padding: 1.25rem 1rem 2.5rem; }
 
 .titulo-pagina { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: .75rem; margin-bottom: 1.25rem; }
@@ -128,12 +120,10 @@ code { font-family: Consolas, "Cascadia Mono", monospace; font-size: .9em; backg
 
 .contador { display: inline-block; min-width: 1.7rem; padding: .05rem .5rem; border-radius: 999px; background: var(--jade-100); color: var(--jade-800); font-size: .85rem; text-align: center; }
 
-/* ---------- Rejillas ---------- */
 .rejilla { display: grid; gap: 1rem; grid-template-columns: 1fr; margin-bottom: 1.25rem; padding: 0; }
 .dos-columnas { display: grid; gap: 1.25rem; grid-template-columns: 1fr; align-items: start; }
 .dos-columnas > .tarjeta { margin-bottom: 0; }
 
-/* ---------- Portada (inicio) ---------- */
 .portada {
   display: grid; gap: 1.5rem; align-items: center;
   background: radial-gradient(circle at 85% 20%, rgba(225,185,60,.25), transparent 40%),
@@ -161,7 +151,6 @@ code { font-family: Consolas, "Cascadia Mono", monospace; font-size: .9em; backg
 .acceso span:last-child { color: var(--sutil); font-size: .9rem; }
 .acceso__icono { width: 48px; height: 48px; border-radius: 14px; background: var(--jade-100) center / 26px no-repeat; margin-bottom: .35rem; }
 
-/* Iconos (SVG en data URI) */
 .acceso__icono--admin, .tarjeta__icono--admin { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230b5d4b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 2l8 4v6c0 5-3.5 9-8 10-4.5-1-8-5-8-10V6z'/%3E%3Cpath d='M9 12l2 2 4-4'/%3E%3C/svg%3E"); }
 .acceso__icono--usuario, .tarjeta__icono--usuario { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230b5d4b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='8' r='4'/%3E%3Cpath d='M4 21c0-4 4-6 8-6s8 2 8 6'/%3E%3C/svg%3E"); }
 .acceso__icono--cajero, .tarjeta__icono--cajero { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230b5d4b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 10l9-6 9 6'/%3E%3Cpath d='M5 10v8M9.5 10v8M14.5 10v8M19 10v8M3 21h18'/%3E%3C/svg%3E"); }
@@ -179,7 +168,6 @@ code { font-family: Consolas, "Cascadia Mono", monospace; font-size: .9em; backg
 
 .fondo-acceso .contenido { display: flex; flex-direction: column; justify-content: center; }
 
-/* ---------- Formularios ---------- */
 .formulario { display: flex; flex-direction: column; }
 .formulario label, .filtro label { font-weight: 600; font-size: .9rem; margin: .65rem 0 .3rem; }
 .formulario label small { font-weight: 400; color: var(--sutil); }
@@ -214,7 +202,6 @@ input.tocado:invalid { border-color: var(--rojo); }
 .en-linea { display: inline; }
 .acciones { display: flex; flex-wrap: wrap; gap: .75rem; margin-top: .75rem; }
 
-/* ---------- Botones ---------- */
 .boton {
   display: inline-flex; align-items: center; justify-content: center; gap: .4rem;
   min-height: 46px; padding: .65rem 1.2rem; border: 1.5px solid transparent; border-radius: 10px;
@@ -232,14 +219,12 @@ input.tocado:invalid { border-color: var(--rojo); }
 .boton--peligro { background: var(--rojo); }
 .boton--peligro:hover { background: #a42539; }
 
-/* ---------- Alertas ---------- */
 .alerta { border-radius: 12px; padding: .85rem 1rem; margin-bottom: 1rem; border: 1px solid; }
 .alerta ul { margin: 0; padding-left: 1.1rem; }
 .alerta--error { background: var(--rojo-claro); border-color: #f3b8c1; color: #7d1a2b; }
 .alerta--exito { background: var(--jade-100); border-color: #a7dcc8; color: var(--jade-800); }
 .alerta--aviso { background: var(--ambar-claro); border-color: #f1d79b; color: #6b4a0f; }
 
-/* ---------- Tablas ---------- */
 .tabla-contenedor { overflow-x: auto; -webkit-overflow-scrolling: touch; }
 .tabla { width: 100%; border-collapse: collapse; font-size: .93rem; }
 .tabla th, .tabla td { padding: .65rem .6rem; text-align: left; border-bottom: 1px solid var(--borde); vertical-align: middle; }
@@ -248,7 +233,6 @@ input.tocado:invalid { border-color: var(--rojo); }
 .tabla tfoot th { background: var(--jade-50); }
 .num { text-align: right !important; white-space: nowrap; font-variant-numeric: tabular-nums; }
 
-/* En celular la tabla se convierte en tarjetas */
 @media (max-width: 719px) {
   .tabla--responsiva thead { display: none; }
   .tabla--responsiva, .tabla--responsiva tbody, .tabla--responsiva tr, .tabla--responsiva td { display: block; width: 100%; }
@@ -268,7 +252,6 @@ input.tocado:invalid { border-color: var(--rojo); }
 .estado--bloqueado { background: var(--rojo-claro); color: var(--rojo); }
 .estado--aviso { background: var(--ambar-claro); color: var(--ambar); }
 
-/* ---------- Indicadores ---------- */
 .kpis { margin-bottom: 1.25rem; }
 .kpi { background: var(--blanco); border: 1px solid var(--borde); border-radius: var(--radio); padding: 1rem 1.1rem; box-shadow: var(--sombra); display: flex; flex-direction: column; gap: .15rem; border-top: 4px solid var(--jade-600); }
 .kpi span { color: var(--sutil); font-size: .85rem; font-weight: 600; }
@@ -279,7 +262,6 @@ input.tocado:invalid { border-color: var(--rojo); }
 .kpi--retiro strong { color: var(--rojo); }
 .rejilla--kpi { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 
-/* ---------- Gráficas SVG ---------- */
 .graficas { display: grid; gap: 1rem; grid-template-columns: 1fr; }
 .graficas figure { margin: 0; background: var(--jade-50); border-radius: 12px; padding: .75rem; }
 .graficas figcaption { text-align: center; color: var(--sutil); font-size: .85rem; margin-top: .25rem; }
@@ -296,7 +278,6 @@ input.tocado:invalid { border-color: var(--rojo); }
 .leyenda__item--deposito::before { background: var(--jade-600); }
 .leyenda__item--retiro::before { background: var(--rojo); }
 
-/* ---------- Saldo / movimientos ---------- */
 .saldo {
   display: grid; gap: 1rem; margin-bottom: 1.25rem; padding: 1.4rem;
   background: linear-gradient(135deg, var(--jade-800), var(--jade-600)); color: var(--blanco);
@@ -324,7 +305,6 @@ input.tocado:invalid { border-color: var(--rojo); }
 .totales { display: flex; flex-wrap: wrap; gap: .5rem 1.5rem; margin-bottom: 1rem; color: var(--sutil); }
 .totales strong { margin-left: .3rem; }
 
-/* ---------- Log de Apache ---------- */
 .segmentado { display: inline-flex; border: 1px solid var(--borde); border-radius: 10px; overflow: hidden; background: var(--blanco); flex-wrap: wrap; }
 .segmentado a { padding: .45rem .8rem; text-decoration: none; font-size: .88rem; color: var(--sutil); }
 .segmentado a[aria-current="true"] { background: var(--jade-700); color: var(--blanco); }
@@ -343,15 +323,11 @@ meter:-moz-meter-optimum::-moz-meter-bar { background: var(--jade-600); }
 .horas__barra { writing-mode: vertical-lr; direction: rtl; width: 100%; height: 130px; }
 .horas__col span { font-size: .65rem; color: var(--sutil); height: 1em; }
 
-/* ---------- Pie ---------- */
 .pie { background: var(--jade-900); color: #a9c8bd; font-size: .85rem; }
 .pie__interior { max-width: 1180px; margin: 0 auto; padding: 1.25rem 1rem; }
 .pie p { margin: .2rem 0; }
 .pie strong { color: var(--oro); }
 
-/* =====================================================================
-   Tabletas (>= 720px)
-   ===================================================================== */
 @media (min-width: 720px) {
   h1 { font-size: 1.9rem; }
   .contenido { padding: 2rem 1.5rem 3rem; }
@@ -367,9 +343,6 @@ meter:-moz-meter-optimum::-moz-meter-bar { background: var(--jade-600); }
   .encabezado-estado dl { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 }
 
-/* =====================================================================
-   Escritorio (>= 1000px)
-   ===================================================================== */
 @media (min-width: 1000px) {
   .menu-boton { display: none; }
   .menu { display: block; flex-basis: auto; }
@@ -384,7 +357,6 @@ meter:-moz-meter-optimum::-moz-meter-bar { background: var(--jade-600); }
   .graficas { grid-template-columns: 1fr 1.3fr; }
 }
 
-/* ---------- Impresión (estado de cuenta) ---------- */
 @media print {
   .barra, .pie, .no-imprimir, .menu-boton { display: none !important; }
   body { background: #fff; }
