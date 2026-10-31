@@ -1,7 +1,5 @@
-# Banco Quetzal - imagen para Render (PHP 8.2 + Apache + GoAccess)
 FROM php:8.2-apache
 
-# Extensión mysqli y GoAccess (análisis del log de Apache)
 RUN apt-get update \
  && apt-get install -y --no-install-recommends goaccess \
  && docker-php-ext-install mysqli \

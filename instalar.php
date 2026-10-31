@@ -1,8 +1,4 @@
 <?php
-/**
- * Instalador web de la base de datos — SOLO funciona desde la misma
- * computadora (localhost). Alternativa a importar el script en phpMyAdmin.
- */
 require_once __DIR__ . '/config/config.php';
 require_once __DIR__ . '/includes/instalador.php';
 

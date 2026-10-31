@@ -32,7 +32,6 @@ if (es_post()) {
 
     if (!$errores) {
         try {
-            // El SP valida: cuenta existente, DPI coincidente, cuenta sin usuario y correo único
             sp('sp_usuario_registrar', [
                 $d['numero'], $d['correo'], $d['dpi'], password_hash($clave, PASSWORD_DEFAULT),
             ]);
