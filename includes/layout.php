@@ -1,8 +1,4 @@
 <?php
-/**
- * Plantilla común: encabezado con logo, menú responsivo según el rol y pie.
- */
-
 function menu_por_rol(?string $rol): array
 {
     switch ($rol) {
@@ -110,7 +106,6 @@ function pie(): void
 <?php
 }
 
-/** Muestra una alerta en línea (errores de validación del formulario). */
 function alertas(array $errores, string $exito = ''): void
 {
     if ($errores) {
@@ -125,7 +120,6 @@ function alertas(array $errores, string $exito = ''): void
     }
 }
 
-/** Formulario de inicio de sesión reutilizado por los tres roles. */
 function pagina_login(string $rol): void
 {
     $titulos = [

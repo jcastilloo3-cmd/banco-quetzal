@@ -1,9 +1,4 @@
 <?php
-/**
- * Gráficas SVG generadas en el servidor (sin librerías externas, se adaptan
- * al ancho de la pantalla con viewBox).
- */
-
 function escala_redonda(float $max): float
 {
     if ($max <= 0) {
@@ -29,7 +24,6 @@ function monto_corto(float $v): string
     return 'Q' . number_format($v, 0);
 }
 
-/** Barras: monto total de depósitos vs retiros del día seleccionado. */
 function grafica_comparativa(float $depositos, float $retiros): string
 {
     $w = 520; $h = 300; $izq = 64; $der = 16; $arr = 24; $aba = 40;
@@ -65,7 +59,6 @@ function grafica_comparativa(float $depositos, float $retiros): string
     return $svg . '</svg>';
 }
 
-/** Barras agrupadas por día (últimos N días): depósitos vs retiros. */
 function grafica_serie(array $dias): string
 {
     $w = 640; $h = 300; $izq = 64; $der = 16; $arr = 20; $aba = 44;

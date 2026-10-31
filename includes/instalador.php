@@ -1,8 +1,4 @@
 <?php
-/**
- * Lógica común del instalador de la base de datos (CLI y página local).
- * Devuelve [ok, mensaje].
- */
 function instalar_bd(bool $forzar = false): array
 {
     mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
@@ -23,7 +19,6 @@ function instalar_bd(bool $forzar = false): array
         return [true, 'La base de datos ya está instalada. Nada que hacer.'];
     }
 
-    // Separar sentencias respetando DELIMITER
     $sql = file_get_contents(__DIR__ . '/../database/banco_quetzal.sql');
     $sentencias = [];
     $delim = ';';
@@ -46,7 +41,6 @@ function instalar_bd(bool $forzar = false): array
 
     $n = 0;
     foreach ($sentencias as $s) {
-        // La BD de destino la define DB_NAME (en Aiven se puede usar "defaultdb")
         if (preg_match('/^\s*(CREATE DATABASE|USE)\b/i', $s)) {
             continue;
         }

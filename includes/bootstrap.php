@@ -1,9 +1,4 @@
 <?php
-/**
- * Arranque común de todas las páginas: configuración, sesión segura,
- * conexión a MySQL (solo por procedimientos almacenados), CSRF y utilidades.
- */
-
 declare(strict_types=1);
 
 require_once __DIR__ . '/../config/config.php';
@@ -14,9 +9,6 @@ $debug = getenv('APP_DEBUG') === '1';
 ini_set('display_errors', $debug ? '1' : '0');
 error_reporting(E_ALL);
 
-// ---------------------------------------------------------------------
-// Cabeceras de seguridad
-// ---------------------------------------------------------------------
 if (!headers_sent()) {
     header('X-Frame-Options: DENY');
     header('X-Content-Type-Options: nosniff');
@@ -28,9 +20,6 @@ if (!headers_sent()) {
     }
 }
 
-// ---------------------------------------------------------------------
-// Sesión
-// ---------------------------------------------------------------------
 function es_https(): bool
 {
     return (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
@@ -50,9 +39,6 @@ if (session_status() !== PHP_SESSION_ACTIVE) {
     session_start();
 }
 
-// ---------------------------------------------------------------------
-// URLs
-// ---------------------------------------------------------------------
 function base_url(): string
 {
     static $base = null;
@@ -101,9 +87,6 @@ function fecha_hora(?string $valor): string
     return date('d/m/Y H:i', strtotime($valor));
 }
 
-// ---------------------------------------------------------------------
-// Base de datos: todo acceso se hace con CALL a procedimientos almacenados
-// ---------------------------------------------------------------------
 if (!function_exists('sp')) {
     function db(): mysqli
     {
@@ -125,19 +108,11 @@ if (!function_exists('sp')) {
         $cn->real_connect(DB_HOST, DB_USER, DB_PASS, DB_NAME, DB_PORT, null, $flags);
         $cn->set_charset('utf8mb4');
         $cn->query("SET NAMES utf8mb4 COLLATE utf8mb4_unicode_ci");
-        // Guatemala no usa horario de verano: UTC-6 todo el año
+
         $cn->query("SET time_zone = '-06:00'");
         return $cn;
     }
 
-    /**
-     * Ejecuta un procedimiento almacenado con parámetros enlazados y devuelve
-     * las filas del primer conjunto de resultados.
-     *
-     * @param string $sp     nombre del procedimiento (solo letras y _)
-     * @param array  $params valores de los parámetros IN
-     * @param string $tipos  tipos para bind_param (s, i, d); por defecto todos 's'
-     */
     function sp(string $sp, array $params = [], string $tipos = ''): array
     {
         if (!preg_match('/^sp_[a-z_]+$/', $sp)) {
@@ -159,7 +134,7 @@ if (!function_exists('sp')) {
             $filas = $res->fetch_all(MYSQLI_ASSOC);
             $res->free();
         }
-        // Consumir los conjuntos restantes que devuelve CALL
+
         while ($stmt->more_results() && $stmt->next_result()) {
             $r = $stmt->get_result();
             if ($r instanceof mysqli_result) {
@@ -177,10 +152,8 @@ function sp_uno(string $sp, array $params = [], string $tipos = ''): ?array
     return $filas[0] ?? null;
 }
 
-/** Mensaje para el usuario: reglas de negocio (SIGNAL 45000) o error genérico. */
 function mensaje_error(Throwable $e): string
 {
-    // SIGNAL SQLSTATE '45000' llega con el código de error 1644 (ER_SIGNAL_EXCEPTION)
     if ($e instanceof mysqli_sql_exception && $e->getCode() === 1644) {
         return $e->getMessage();
     }
@@ -191,9 +164,6 @@ function mensaje_error(Throwable $e): string
     return 'Ocurrió un error al procesar la solicitud. Intente nuevamente.';
 }
 
-// ---------------------------------------------------------------------
-// CSRF y mensajes flash
-// ---------------------------------------------------------------------
 function csrf_token(): string
 {
     if (empty($_SESSION['csrf'])) {
@@ -236,9 +206,6 @@ function campo(string $nombre): string
     return is_string($v) ? trim($v) : '';
 }
 
-// ---------------------------------------------------------------------
-// Validaciones del lado del servidor
-// ---------------------------------------------------------------------
 function valida_numero_cuenta(string $v): bool { return (bool) preg_match('/^\d{6,20}$/', $v); }
 function valida_dpi(string $v): bool           { return (bool) preg_match('/^\d{13}$/', $v); }
 function valida_usuario(string $v): bool       { return (bool) preg_match('/^[A-Za-z0-9._-]{4,30}$/', $v); }
@@ -250,13 +217,13 @@ function valida_correo(string $v): bool
 {
     return strlen($v) <= 120 && filter_var($v, FILTER_VALIDATE_EMAIL) !== false;
 }
-/** Mínimo 8 caracteres con mayúscula, minúscula y número. */
+
 function valida_clave(string $v): bool
 {
     return strlen($v) >= 8 && strlen($v) <= 72
         && preg_match('/[A-Z]/', $v) && preg_match('/[a-z]/', $v) && preg_match('/\d/', $v);
 }
-/** Devuelve el monto como string decimal con 2 decimales o null si no es válido. */
+
 function monto_valido(string $v, bool $permitir_cero = false): ?string
 {
     $v = str_replace([',', ' ', 'Q'], '', $v);
@@ -271,9 +238,6 @@ function monto_valido(string $v, bool $permitir_cero = false): ?string
 
 const MSJ_CLAVE = 'La contraseña debe tener al menos 8 caracteres e incluir mayúscula, minúscula y número.';
 
-// ---------------------------------------------------------------------
-// Autenticación y autorización por rol
-// ---------------------------------------------------------------------
 const ROLES = ['admin' => 'Administrador', 'cajero' => 'Cajero', 'usuario' => 'Cliente'];
 
 function usuario_actual(): ?array
@@ -299,7 +263,6 @@ function cerrar_sesion(): void
     session_destroy();
 }
 
-/** Exige que haya una sesión activa del rol indicado. */
 function requiere_rol(string $rol): array
 {
     $auth = usuario_actual();
@@ -310,7 +273,6 @@ function requiere_rol(string $rol): array
         redirigir($login);
     }
 
-    // Expiración por inactividad
     $ultimo = $_SESSION['ultimo_movimiento'] ?? 0;
     if (time() - $ultimo > APP_MINUTOS_SESION * 60) {
         cerrar_sesion();
@@ -320,7 +282,6 @@ function requiere_rol(string $rol): array
     }
     $_SESSION['ultimo_movimiento'] = time();
 
-    // Un cajero bloqueado pierde el acceso de inmediato
     if ($rol === 'cajero') {
         try {
             $c = sp_uno('sp_cajero_obtener_por_id', [$auth['id']], 'i');
@@ -337,7 +298,6 @@ function requiere_rol(string $rol): array
     return $auth;
 }
 
-// Límite de intentos fallidos de inicio de sesión (por sesión y rol)
 function login_en_espera(string $rol): int
 {
     $i = $_SESSION['intentos'][$rol] ?? ['n' => 0, 't' => 0];

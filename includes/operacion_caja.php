@@ -1,7 +1,4 @@
 <?php
-/**
- * Formulario compartido de depósito y retiro en ventanilla.
- */
 function pagina_operacion_caja(string $tipo): void
 {
     $auth = requiere_rol('cajero');

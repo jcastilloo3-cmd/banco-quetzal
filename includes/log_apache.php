@@ -1,9 +1,4 @@
 <?php
-/**
- * Analizador del access.log de Apache (formatos "common" y "combined").
- * Lee como máximo los últimos $maxBytes del archivo.
- */
-
 function analizar_log_apache(string $ruta, bool $soloPaginas = false, string $prefijo = '', int $maxBytes = 8000000): array
 {
     $r = [
@@ -20,7 +15,7 @@ function analizar_log_apache(string $ruta, bool $soloPaginas = false, string $pr
     $fh = fopen($ruta, 'rb');
     if ($r['tamano'] > $maxBytes) {
         fseek($fh, -$maxBytes, SEEK_END);
-        fgets($fh); // descartar línea parcial
+        fgets($fh);
     }
 
     $re = '/^(\S+) \S+ \S+ \[([^\]]+)\] "(\S+) (\S+)[^"]*" (\d{3}) (\S+)/';
@@ -31,7 +26,7 @@ function analizar_log_apache(string $ruta, bool $soloPaginas = false, string $pr
         }
         [, $ip, $fecha, $metodo, $ruta_req, $codigo, $bytes] = $m;
         $path = strtok($ruta_req, '?') ?: '/';
-        // En WampServer el log es compartido: se cuentan solo las rutas de esta aplicación
+
         if ($prefijo !== '' && strpos($path, $prefijo) !== 0) {
             continue;
         }
