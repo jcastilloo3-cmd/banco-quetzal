@@ -32,7 +32,6 @@ if (es_post()) {
 
     if (!$errores) {
         try {
-            // El SP valida que la cuenta exista, que no sea la propia y que no esté repetida
             sp('sp_tercero_agregar', [$auth['id'], $d['numero'], $monto, $max, $d['alias']], 'issis');
             $exito = 'Cuenta de tercero <strong>' . e($d['alias']) . '</strong> agregada correctamente.';
             $d = ['numero' => '', 'monto' => '', 'max' => '', 'alias' => ''];

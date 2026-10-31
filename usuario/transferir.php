@@ -24,8 +24,6 @@ if (es_post()) {
 
     if (!$errores) {
         try {
-            // El SP valida monto máximo, transacciones diarias y fondos, y ejecuta
-            // la operación dentro de START TRANSACTION ... COMMIT (ROLLBACK si falla)
             $r = sp_uno('sp_transferir', [$auth['id'], $sel, $monto], 'iis');
             $exito = 'Transferencia No. <strong>' . (int) $r['transferencia_id'] . '</strong> realizada: '
                    . '<strong>' . e(dinero($r['monto'])) . '</strong> a <strong>' . e($r['alias'])
