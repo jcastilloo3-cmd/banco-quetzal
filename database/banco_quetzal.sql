@@ -1,27 +1,9 @@
--- =====================================================================
---  BANCO QUETZAL - Sistema de Banca en Línea
---  Universidad Mariano Gálvez de Guatemala - Desarrollo Web
---  Proyecto HTML5 / CSS3 / PHP / MySQL
---  Autor: Jorge Otoniel Castillo Ortega - Carné 0900-13-719
---
---  Script completo de la base de datos:
---    * Tablas (InnoDB, utf8mb4)
---    * Procedimientos almacenados (TODO el acceso a datos pasa por SPs)
---    * Único registro inicial: el usuario administrador (BD en blanco)
---
---  Compatible con MySQL 8.x (WampServer / Aiven) y MariaDB 10.4+.
---  Importar desde phpMyAdmin (pestaña Importar) o con el cliente mysql:
---      mysql -u root -p < banco_quetzal.sql
--- =====================================================================
-
 CREATE DATABASE IF NOT EXISTS banco_quetzal
   DEFAULT CHARACTER SET utf8mb4
   DEFAULT COLLATE utf8mb4_unicode_ci;
 
 USE banco_quetzal;
 
--- Intercalación por defecto de la BD: los parámetros de los procedimientos la heredan.
--- (MySQL 8 usa utf8mb4_0900_ai_ci por defecto y no se puede comparar con utf8mb4_unicode_ci)
 ALTER DATABASE CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 SET NAMES utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -36,10 +18,6 @@ DROP TABLE IF EXISTS cajeros;
 DROP TABLE IF EXISTS administradores;
 
 SET FOREIGN_KEY_CHECKS = 1;
-
--- ---------------------------------------------------------------------
--- TABLAS
--- ---------------------------------------------------------------------
 
 CREATE TABLE administradores (
   id          INT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -78,8 +56,6 @@ CREATE TABLE cuentas (
   CONSTRAINT fk_cuenta_cajero FOREIGN KEY (cajero_id) REFERENCES cajeros (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Usuarios cliente del portal (el correo es el nombre de usuario).
--- Una cuenta bancaria solo puede tener un usuario (uq_usuario_cuenta).
 CREATE TABLE usuarios (
   id             INT UNSIGNED NOT NULL AUTO_INCREMENT,
   cuenta_id      INT UNSIGNED NOT NULL,
@@ -94,7 +70,6 @@ CREATE TABLE usuarios (
   CONSTRAINT fk_usuario_cuenta FOREIGN KEY (cuenta_id) REFERENCES cuentas (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Cuentas de terceros: solo existen para el usuario que las crea.
 CREATE TABLE cuentas_terceros (
   id                         INT UNSIGNED  NOT NULL AUTO_INCREMENT,
   usuario_id                 INT UNSIGNED  NOT NULL,
@@ -127,7 +102,6 @@ CREATE TABLE transferencias (
   CONSTRAINT fk_trf_destino FOREIGN KEY (cuenta_destino_id) REFERENCES cuentas (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Libro de movimientos: cada débito o crédito de cada cuenta.
 CREATE TABLE movimientos (
   id                BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   cuenta_id         INT UNSIGNED    NOT NULL,
@@ -146,12 +120,6 @@ CREATE TABLE movimientos (
   CONSTRAINT fk_mov_cajero FOREIGN KEY (cajero_id)        REFERENCES cajeros (id),
   CONSTRAINT fk_mov_trf    FOREIGN KEY (transferencia_id) REFERENCES transferencias (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- ---------------------------------------------------------------------
--- PROCEDIMIENTOS ALMACENADOS
--- Los errores de negocio se devuelven con SIGNAL SQLSTATE '45000'
--- y la aplicación PHP muestra MESSAGE_TEXT al usuario.
--- ---------------------------------------------------------------------
 
 DROP PROCEDURE IF EXISTS sp_admin_obtener;
 DROP PROCEDURE IF EXISTS sp_cajero_obtener;
@@ -177,16 +145,12 @@ DROP PROCEDURE IF EXISTS sp_monitor_serie;
 
 DELIMITER $$
 
--- ===================== ADMINISTRADOR =====================
-
 CREATE PROCEDURE sp_admin_obtener(IN p_usuario VARCHAR(30))
 BEGIN
   SELECT id, nombre, usuario, clave_hash
     FROM administradores
    WHERE usuario = p_usuario;
 END$$
-
--- ===================== CAJEROS =====================
 
 CREATE PROCEDURE sp_cajero_obtener(IN p_usuario VARCHAR(30))
 BEGIN
@@ -237,8 +201,6 @@ BEGIN
   SELECT id, usuario, bloqueado FROM cajeros WHERE id = p_id;
 END$$
 
--- ===================== CUENTAS / CAJA =====================
-
 CREATE PROCEDURE sp_cuenta_crear(
   IN p_numero    VARCHAR(20),
   IN p_nombre    VARCHAR(120),
@@ -269,7 +231,6 @@ BEGIN
 
   SET v_cuenta_id = LAST_INSERT_ID();
 
-  -- El monto inicial queda registrado como el primer depósito de la cuenta
   IF p_monto > 0 THEN
     INSERT INTO movimientos (cuenta_id, tipo, naturaleza, monto, saldo_resultante, descripcion, cajero_id)
     VALUES (v_cuenta_id, 'DEPOSITO', 'CREDITO', p_monto, p_monto,
@@ -383,8 +344,6 @@ BEGIN
    LIMIT 10;
 END$$
 
--- ===================== USUARIOS CLIENTE =====================
-
 CREATE PROCEDURE sp_usuario_registrar(
   IN p_numero VARCHAR(20),
   IN p_correo VARCHAR(120),
@@ -397,22 +356,18 @@ BEGIN
   SELECT id, dpi INTO v_cuenta_id, v_dpi
     FROM cuentas WHERE numero_cuenta = p_numero;
 
-  -- 1) La cuenta debe haber sido creada antes por un cajero
   IF v_cuenta_id IS NULL THEN
     SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'La cuenta bancaria no existe. Primero debe abrirla en una agencia del banco.';
   END IF;
 
-  -- 2) El DPI debe coincidir con el registrado en la cuenta
   IF v_dpi <> p_dpi THEN
     SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'El DPI no coincide con el registrado en la cuenta.';
   END IF;
 
-  -- 3) No debe existir otro usuario para esa cuenta
   IF EXISTS (SELECT 1 FROM usuarios WHERE cuenta_id = v_cuenta_id) THEN
     SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Ya existe un usuario registrado para esta cuenta.';
   END IF;
 
-  -- 4) El correo (nombre de usuario) debe ser único
   IF EXISTS (SELECT 1 FROM usuarios WHERE correo = p_correo) THEN
     SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'El correo electrónico ya está registrado.';
   END IF;
@@ -446,8 +401,6 @@ BEGIN
     JOIN cuentas c ON c.id = u.cuenta_id
    WHERE u.id = p_usuario_id;
 END$$
-
--- ===================== CUENTAS DE TERCEROS =====================
 
 CREATE PROCEDURE sp_tercero_agregar(
   IN p_usuario_id INT UNSIGNED,
@@ -493,7 +446,6 @@ BEGIN
   SELECT LAST_INSERT_ID() AS id;
 END$$
 
--- Solo devuelve las cuentas de terceros del usuario indicado
 CREATE PROCEDURE sp_tercero_listar(IN p_usuario_id INT UNSIGNED)
 BEGIN
   SELECT t.id, t.alias, c.numero_cuenta, c.nombre AS titular,
@@ -505,8 +457,6 @@ BEGIN
    WHERE t.usuario_id = p_usuario_id
    ORDER BY t.alias;
 END$$
-
--- ===================== TRANSFERENCIA (contexto de transacción) =====================
 
 CREATE PROCEDURE sp_transferir(
   IN p_usuario_id INT UNSIGNED,
@@ -526,7 +476,6 @@ BEGIN
   DECLARE v_trf_id      INT UNSIGNED;
   DECLARE v_msg         VARCHAR(255);
 
-  -- Cualquier error deshace TODA la operación
   DECLARE EXIT HANDLER FOR SQLEXCEPTION
   BEGIN
     ROLLBACK;
@@ -541,8 +490,6 @@ BEGIN
 
   SELECT cuenta_id INTO v_origen FROM usuarios WHERE id = p_usuario_id;
 
-  -- La cuenta de tercero debe pertenecer al usuario conectado (se bloquea la fila
-  -- para que dos transferencias simultáneas no superen el límite diario)
   SELECT cuenta_id, monto_maximo, max_transacciones_diarias, alias
     INTO v_destino, v_max_monto, v_max_trans, v_alias
     FROM cuentas_terceros
@@ -553,14 +500,12 @@ BEGIN
     SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'La cuenta de tercero seleccionada no es válida.';
   END IF;
 
-  -- Validación 1: monto máximo por operación
   IF p_monto > v_max_monto THEN
     SET v_msg = CONCAT('El monto supera el máximo permitido para "', v_alias,
                        '" (Q ', FORMAT(v_max_monto, 2), ' por transferencia).');
     SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = v_msg;
   END IF;
 
-  -- Validación 2: cantidad máxima de transferencias diarias a esa cuenta
   SELECT COUNT(*) INTO v_hoy
     FROM transferencias
    WHERE tercero_id = p_tercero_id
@@ -573,7 +518,6 @@ BEGIN
     SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = v_msg;
   END IF;
 
-  -- Bloqueo de ambas cuentas en orden de id (evita interbloqueos)
   IF v_origen < v_destino THEN
     SELECT saldo, numero_cuenta INTO v_saldo_ori, v_num_ori FROM cuentas WHERE id = v_origen  FOR UPDATE;
     SELECT saldo, numero_cuenta INTO v_saldo_des, v_num_des FROM cuentas WHERE id = v_destino FOR UPDATE;
@@ -582,7 +526,6 @@ BEGIN
     SELECT saldo, numero_cuenta INTO v_saldo_ori, v_num_ori FROM cuentas WHERE id = v_origen  FOR UPDATE;
   END IF;
 
-  -- Validación 3: fondos suficientes
   IF v_saldo_ori < p_monto THEN
     SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Fondos insuficientes para realizar la transferencia.';
   END IF;
@@ -612,8 +555,6 @@ BEGIN
          p_monto AS monto, v_saldo_ori AS saldo_disponible;
 END$$
 
--- ===================== ESTADO DE CUENTA =====================
-
 CREATE PROCEDURE sp_estado_cuenta(
   IN p_usuario_id INT UNSIGNED,
   IN p_desde      DATE,
@@ -630,8 +571,6 @@ BEGIN
      AND (p_hasta IS NULL OR m.creado_en <  p_hasta + INTERVAL 1 DAY)
    ORDER BY m.creado_en, m.id;
 END$$
-
--- ===================== MONITOR (ADMINISTRADOR) =====================
 
 CREATE PROCEDURE sp_monitor_resumen(IN p_fecha DATE)
 BEGIN
@@ -654,7 +593,6 @@ BEGIN
     (SELECT COALESCE(SUM(monto),0) FROM transferencias WHERE creado_en >= v_ini AND creado_en < v_fin) AS monto_transferencias;
 END$$
 
--- Montos diarios de depósitos y retiros de los últimos p_dias días hasta p_fecha
 CREATE PROCEDURE sp_monitor_serie(IN p_fecha DATE, IN p_dias INT)
 BEGIN
   SELECT DATE(creado_en) AS fecha,
@@ -670,11 +608,6 @@ END$$
 
 DELIMITER ;
 
--- ---------------------------------------------------------------------
--- DATOS INICIALES: solo el administrador (base de datos en blanco)
---   Usuario: admin
---   Clave:   BancoQ2026!   (se guarda como hash bcrypt)
--- ---------------------------------------------------------------------
 INSERT INTO administradores (nombre, usuario, clave_hash)
 VALUES ('Administrador del Sistema', 'admin',
         '$2y$10$/GWkOakkrHef30XbSzRQiOOMm.i0sbeky1CKu69140xLHzx6t2sr.');

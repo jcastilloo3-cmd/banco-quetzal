@@ -1,12 +1,4 @@
 <?php
-/**
- * Instalador de la base de datos (línea de comandos).
- *
- *   php database/instalar.php            -> instala solo si la BD está vacía
- *   php database/instalar.php --forzar   -> borra y vuelve a crear todo
- *
- * Lo ejecuta automáticamente el contenedor de Render al arrancar.
- */
 if (PHP_SAPI !== 'cli') {
     http_response_code(404);
     exit;
