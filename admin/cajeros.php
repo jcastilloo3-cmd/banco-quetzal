@@ -9,7 +9,6 @@ if (es_post()) {
     if (!csrf_valido()) {
         $errores[] = 'La sesión del formulario expiró. Recargue la página e intente de nuevo.';
     } elseif (($_POST['accion'] ?? '') === 'estado') {
-        // Bloquear / desbloquear
         $id = filter_var($_POST['id'] ?? '', FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
         $bloquear = ($_POST['bloquear'] ?? '') === '1' ? 1 : 0;
         if ($id) {
@@ -22,7 +21,6 @@ if (es_post()) {
         }
         redirigir('admin/cajeros.php');
     } else {
-        // Agregar cajero
         $d['nombre']  = preg_replace('/\s+/', ' ', campo('nombre'));
         $d['usuario'] = campo('usuario');
         $clave    = (string) ($_POST['clave'] ?? '');

@@ -13,7 +13,7 @@ $r = null;
 $serie = [];
 try {
     $r = sp_uno('sp_monitor_resumen', [$fecha]);
-    // Últimos 7 días (se rellenan con cero los días sin movimientos)
+
     for ($i = 6; $i >= 0; $i--) {
         $dia = date('Y-m-d', strtotime("$fecha -$i day"));
         $serie[$dia] = ['dep' => 0, 'ret' => 0];
